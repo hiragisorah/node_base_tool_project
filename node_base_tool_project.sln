@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "node_base_tool_project", "node_base_tool_project.vcxproj", "{B0CB25A9-448D-4D06-916C-0E4E276FAAF8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "graphics", "graphics\graphics.vcxproj", "{E8645E05-FA26-4B6E-AEBB-881B1330CED3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "window", "window\window.vcxproj", "{B12702AD-ABFB-343A-A199-8E24837244A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +25,20 @@ Global
 		{B0CB25A9-448D-4D06-916C-0E4E276FAAF8}.Release|x64.Build.0 = Release|x64
 		{B0CB25A9-448D-4D06-916C-0E4E276FAAF8}.Release|x86.ActiveCfg = Release|Win32
 		{B0CB25A9-448D-4D06-916C-0E4E276FAAF8}.Release|x86.Build.0 = Release|Win32
+		{E8645E05-FA26-4B6E-AEBB-881B1330CED3}.Debug|x64.ActiveCfg = Debug|x64
+		{E8645E05-FA26-4B6E-AEBB-881B1330CED3}.Debug|x64.Build.0 = Debug|x64
+		{E8645E05-FA26-4B6E-AEBB-881B1330CED3}.Debug|x86.ActiveCfg = Debug|Win32
+		{E8645E05-FA26-4B6E-AEBB-881B1330CED3}.Debug|x86.Build.0 = Debug|Win32
+		{E8645E05-FA26-4B6E-AEBB-881B1330CED3}.Release|x64.ActiveCfg = Release|x64
+		{E8645E05-FA26-4B6E-AEBB-881B1330CED3}.Release|x64.Build.0 = Release|x64
+		{E8645E05-FA26-4B6E-AEBB-881B1330CED3}.Release|x86.ActiveCfg = Release|Win32
+		{E8645E05-FA26-4B6E-AEBB-881B1330CED3}.Release|x86.Build.0 = Release|Win32
+		{B12702AD-ABFB-343A-A199-8E24837244A3}.Debug|x64.ActiveCfg = Debug|x64
+		{B12702AD-ABFB-343A-A199-8E24837244A3}.Debug|x64.Build.0 = Debug|x64
+		{B12702AD-ABFB-343A-A199-8E24837244A3}.Debug|x86.ActiveCfg = Debug|x64
+		{B12702AD-ABFB-343A-A199-8E24837244A3}.Release|x64.ActiveCfg = Release|x64
+		{B12702AD-ABFB-343A-A199-8E24837244A3}.Release|x64.Build.0 = Release|x64
+		{B12702AD-ABFB-343A-A199-8E24837244A3}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
