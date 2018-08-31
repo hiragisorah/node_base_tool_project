@@ -30,7 +30,7 @@ namespace Seed
 			else
 			{
 				this->database_.emplace_back(std::move(data));
-				return this->database_.size() - 1;
+				return static_cast<unsigned int>(this->database_.size() - 1);
 			}
 		}
 		void Unload(const _Key & num)

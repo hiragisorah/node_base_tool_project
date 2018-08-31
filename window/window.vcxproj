@@ -114,6 +114,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="node.cpp" />
+    <ClCompile Include="node_system.cpp" />
+    <ClCompile Include="port.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -126,9 +129,17 @@
     <QtRcc Include="window.qrc" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="window.rc" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\graphics\graphics.vcxproj">
       <Project>{e8645e05-fa26-4b6e-aebb-881b1330ced3}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="node.h" />
+    <ClInclude Include="node_system.h" />
+    <ClInclude Include="port.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
@@ -138,7 +149,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties MocDir=".\GeneratedFiles\$(ConfigurationName)" UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" lupdateOptions="" lupdateOnBuild="0" lreleaseOptions="" Qt5Version_x0020_x64="Qt 64" MocOptions="" />
+      <UserProperties MocDir=".\GeneratedFiles\$(ConfigurationName)" UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" lupdateOptions="" lupdateOnBuild="0" lreleaseOptions="" Qt5Version_x0020_x64="msvc2017_64" MocOptions="" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
