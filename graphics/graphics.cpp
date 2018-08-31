@@ -216,24 +216,45 @@ void Seed::Graphics::Initialize(void)
 		device->CreateRasterizerState(&desc, rs.GetAddressOf());
 		this->impl_->device_context_->RSSetState(rs.Get());
 	}
+
+	{
+		D3D11_SAMPLER_DESC desc = {};
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> ss;
+
+		desc.Filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+		desc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
+		desc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
+		desc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;      
+		desc.MipLODBias = 0;
+		desc.MaxAnisotropy = 1;
+		desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+		desc.BorderColor[0] = 0;
+		desc.BorderColor[1] = 0;
+		desc.BorderColor[2] = 0;
+		desc.BorderColor[3] = 0;
+		desc.MinLOD = 0;
+		desc.MaxLOD = D3D11_FLOAT32_MAX;         
+		device->CreateSamplerState(&desc, ss.GetAddressOf());
+		this->impl_->device_context_->PSSetSamplers(0, 1, ss.GetAddressOf());
+	}
 }
 
-void * const Seed::Graphics::handle(void)
+void * const Seed::Graphics::handle(void) const
 {
 	return this->impl_->handle_;
 }
 
-const unsigned int & Seed::Graphics::width(void)
+const unsigned int & Seed::Graphics::width(void) const
 {
 	return this->impl_->width_;
 }
 
-const unsigned int & Seed::Graphics::height(void)
+const unsigned int & Seed::Graphics::height(void) const
 {
 	return this->impl_->height_;
 }
 
-void Seed::Graphics::ConnectToWindow(void * handle, const unsigned int & width, const unsigned int & height)
+void Seed::Graphics::ConnectToWindow(void * const handle, const unsigned int & width, const unsigned int & height)
 {
 	this->impl_->handle_ = handle;
 	this->impl_->width_ = width;

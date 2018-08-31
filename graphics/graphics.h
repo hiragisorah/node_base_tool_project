@@ -64,12 +64,12 @@ namespace Seed
 		// @param (height) 引数の説明
 		// @detail グラフィックスの描画対象ウィンドウのハンドルと描画領域の大きさをを確定
 		//*
-		void ConnectToWindow(void * handle, const unsigned int & width, const unsigned int & height);
+		void ConnectToWindow(void * const handle, const unsigned int & width, const unsigned int & height);
 		
 	public:
-		void * const handle(void);
-		const unsigned int & width(void);
-		const unsigned int & height(void);
+		void * const handle(void) const;
+		const unsigned int & width(void) const;
+		const unsigned int & height(void) const;
 
 	public:
 		void ClearRenderTarget(const std::vector<unsigned int> & render_target_id_s);
@@ -116,7 +116,6 @@ namespace Seed
 		void DrawTexture(const unsigned int & texture_id, const DirectX::Vector2 & position, const DirectX::Vector2 & scale, const float & ang);
 		void DrawTextureFixed(const unsigned int & texture_id, const DirectX::Vector2 & position, const DirectX::Vector2 & size, const float & ang);
 
-	public:
 		class Impl;
 
 	private:

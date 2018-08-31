@@ -43,16 +43,6 @@ void window::Update(void)
 		this->graphics_->SetRenderTargetAndDepthStencil({ this->bb_ }, -1);
 		this->graphics_->SetViewPort({ this->vp_ });
 
-		auto sw = static_cast<float>(this->graphics_->width());
-		auto sh = static_cast<float>(this->graphics_->height());
-
-
-		{ // bg
-			this->graphics_->SetShader(this->sh_default_);
-			this->graphics_->SetColor(DirectX::Color(1, 1, 1, 1));
-			this->graphics_->DrawTextureFixed(this->tex_none_, { 0,0 }, { sw,sh }, 0);
-		}
-
 		static Seed::NodeSystem node_system(this->graphics_);
 
 		static int xxxx = 0;

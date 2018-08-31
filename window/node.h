@@ -19,7 +19,8 @@ namespace Seed
 
 	public:
 		void set_position(const DirectX::Vector3 & position);
-		const DirectX::Vector3 & position(void);
+		const DirectX::Vector3 & position(void) const;
+		const DirectX::Vector3 position(const DirectX::Matrix & view) const;
 		void set_size(const DirectX::Vector2 & size);
 		const DirectX::Vector2 & size(void);
 
@@ -34,11 +35,11 @@ namespace Seed
 		const std::unique_ptr<Port> & output_port(const unsigned int & port) const;
 		template<class _Port> void add_input_port(void)
 		{
-			this->input_ports_.emplace_back(std::make_unique<_Port>());
+			this->input_ports_.emplace_back(std::make_unique<_Port>(PortType::Input));
 		}
 		template<class _Port> void add_output_port(void)
 		{
-			this->output_ports_.emplace_back(std::make_unique<_Port>());
+			this->output_ports_.emplace_back(std::make_unique<_Port>(PortType::Output));
 		}
 
 	public:

@@ -5,15 +5,23 @@ static DirectX::Vector2 mouse = {};
 Seed::NodeSystem::NodeSystem(const std::unique_ptr<Graphics>& graphics)
 	: graphics_(graphics)
 	, node_tex_(0)
-	, port_tex_(0)
+	, input_port_tex_(0)
+	, output_port_tex_(0)
 	, nine_path_shader_(0)
 	, default_shader_(0)
 	, grab_node_(nullptr)
+	, view_pos_(DirectX::Vector3::Zero)
+	, screen_grab_(false)
 {
 	this->default_shader_ = graphics->LoadShader("default.hlsl");
+	this->repeat_shader_ = graphics->LoadShader("repeat.hlsl");
 	this->nine_path_shader_ = graphics->LoadShader("nine_patch.hlsl");
+	this->bg_tex_ = graphics->LoadTexture("bg.png");
 	this->node_tex_ = graphics->LoadTexture("node-simple.png");
-	this->port_tex_ = graphics->LoadTexture("node-connect-hole.png");
+	this->input_port_tex_ = graphics->LoadTexture("output_port.png");
+	this->output_port_tex_ = graphics->LoadTexture("input_port.png");
+
+
 }
 
 void Seed::NodeSystem::Draw9Patch(const unsigned int & texture_id, const float & x, const float & y, const float & width, const float & height, const float & ang)
@@ -90,7 +98,16 @@ void Seed::NodeSystem::Update(void)
 		old_frame = now_frame;
 	}
 
+	if (l_release)
+		this->screen_grab_ = false;
+
+	if (this->screen_grab_)
+		this->view_pos_ += mouse - old_mouse;
+
 	bool on_node = false;
+	bool direct_touch = true;
+
+	auto view = DirectX::Matrix::CreateTranslation(this->view_pos_.x, this->view_pos_.y, 0);
 
 	if (this->grab_node_)
 		(*this->grab_node_)->set_position((*this->grab_node_)->position() + (mouse - old_mouse));
@@ -103,55 +120,94 @@ void Seed::NodeSystem::Update(void)
 		for (int n = 0; n < node->input_port_cnt(); ++n)
 		{
 			auto & port = node->input_port(n);
-			auto port_pos = port->position();
+			auto port_pos = port->position(view);
+
+			if (port->connect())
+			{
+				auto & a = port_pos;
+				auto & b = port->connect()->position(view);
+
+				auto ang1 = DirectX::XMConvertToDegrees(atan2f(a.y - mouse.y, a.x - mouse.x));
+				auto ang2 = DirectX::XMConvertToDegrees(atan2f(b.y - mouse.y, b.x - mouse.x) + DirectX::XM_PI);
+
+				if (ang1 > 180.f)
+					ang1 -= 360.f;
+				if (ang1 < -180.f)
+					ang1 += 360.f;
+
+				if (ang2 > 180.f)
+					ang2 -= 360.f;
+				if (ang2 < -180.f)
+					ang2 += 360.f;
+
+				if (fabsf(ang1 - ang2) < 10.f)
+					if (l_trigger)
+					{
+						port->connect()->set_connect(nullptr);
+						port->set_connect(nullptr);
+						nodes_break = true;
+						direct_touch = false;
+						break;
+					}
+			}
+
 			if (DirectX::Vector2::Distance(mouse, port_pos) < 10.f)
 			{
-				node->input_port(n)->set_color(DirectX::Color(1, 1, 1, 1));
+				node->input_port(n)->set_alpha(1);
 
 				if (l_trigger)
 					this->start_port_ = port.get();
 
-				if (l_release && this->start_port_)
+				if (l_release && this->start_port_ && this->start_port_->type() == PortType::Output)
 				{
-					port->set_connect(this->start_port_);
-					this->start_port_->set_connect(port.get());
+					if (this->start_port_->var_type() == port->var_type())
+					{
+						port->set_connect(this->start_port_);
+						this->start_port_->set_connect(port.get());
+					}
 				}
 
+				direct_touch = false;
 				nodes_break = true;
 				break;
 			}
 			else
-				node->input_port(n)->set_color(DirectX::Color(1, 1, 1, .5f));
+				node->input_port(n)->set_alpha(.5f);
 		}
 		for (int n = 0; n < node->output_port_cnt(); ++n)
 		{
 			auto & port = node->output_port(n);
-			auto port_pos = port->position();
+			auto port_pos = port->position(view);
 			if (DirectX::Vector2::Distance(mouse, port_pos) < 10.f)
 			{
-				node->output_port(n)->set_color(DirectX::Color(1, 1, 1, 1));
+				node->output_port(n)->set_alpha(1);
 
 				if (l_trigger)
 					this->start_port_ = port.get();
 
-				if (l_release && this->start_port_)
+				if (l_release && this->start_port_ && this->start_port_->type() == PortType::Input)
 				{
-					port->set_connect(this->start_port_);
-					this->start_port_->set_connect(port.get());
+					if (this->start_port_->var_type() == port->var_type())
+					{
+						port->set_connect(this->start_port_);
+						this->start_port_->set_connect(port.get());
+					}
 				}
 
+				direct_touch = false;
 				nodes_break = true;
 				break;
 			}
 			else
-				node->output_port(n)->set_color(DirectX::Color(1, 1, 1, .5f));
+				node->output_port(n)->set_alpha(.5f);
 		}
 
 		if (nodes_break) break;
 
-		if (fabsf(mouse.x - node->position().x) < node->size().x)
-			if (fabsf(mouse.y - node->position().y) < node->size().y)
+		if (fabsf(mouse.x - node->position(view).x) < node->size().x)
+			if (fabsf(mouse.y - node->position(view).y) < node->size().y)
 			{
+				direct_touch = false;
 				on_node = true;
 
 				if (l_trigger)
@@ -163,8 +219,11 @@ void Seed::NodeSystem::Update(void)
 	}
 
 	if (!nodes_break && !on_node && r_trigger)
-		this->AddNodes<Node>(DirectX::Vector3(mouse.x, mouse.y, 0));
-	
+		this->AddNodes<Node>(DirectX::Vector3(mouse.x, mouse.y, 0), view);
+
+	if (direct_touch && l_trigger)
+		this->screen_grab_ = true;
+
 	//node->set_size(DirectX::Vector2(2.f, 2.f));
 
 	//if (GetKeyState(VK_LBUTTON) & 0x80)
@@ -182,9 +241,29 @@ void Seed::NodeSystem::Update(void)
 
 void Seed::NodeSystem::Draw(void)
 {
+	auto view = DirectX::Matrix::CreateTranslation(this->view_pos_.x, this->view_pos_.y, 0);
+
+	auto sw = static_cast<float>(this->graphics_->width());
+	auto sh = static_cast<float>(this->graphics_->height());
+
+	{ // bg
+		auto size = this->graphics_->GetTextureSize(this->bg_tex_);
+
+		auto scale = this->repeat_cb_.uv_.scale = { sw / size.x, sh / size.y };
+		this->repeat_cb_.uv_.scroll = { -this->view_pos_.x / size.x / 2, this->view_pos_.y / size.y / 2 };
+
+		this->graphics_->SetView(DirectX::Matrix::Identity);
+		this->graphics_->SetShader(this->repeat_shader_);
+		this->graphics_->SetConstantBuffer(this->repeat_shader_, &this->repeat_cb_);
+		this->graphics_->SetColor(DirectX::Color(1, 1, 1, 1));
+		this->graphics_->DrawTexture(this->bg_tex_, { 0,0 }, scale, 0);
+	}
+
 	this->graphics_->SetShader(this->nine_path_shader_);
 	for (auto & node : this->nodes_)
 	{
+		this->graphics_->SetView(view);
+		this->graphics_->SetColor({ 1, 1, 1, 0.7f });
 		this->Draw9Patch(this->node_tex_, node->position().x, node->position().y, node->size().x, node->size().y, 0);
 	}
 
@@ -195,17 +274,38 @@ void Seed::NodeSystem::Draw(void)
 		{ // hole-left
 			auto & port = node->input_port(n);
 			this->graphics_->SetColor(node->input_port(n)->color());
-			auto & position = node->position();
 			auto & size = node->size();
-			this->graphics_->DrawTexture(this->port_tex_, port->position(), { 0.2f, 0.2f }, 0);
+			this->graphics_->SetView(view);
+			this->graphics_->DrawTexture(this->input_port_tex_, port->position(), { 0.1f, 0.1f }, 0);
 
 			if (port->connect())
 			{
-				auto pos = port->position();
 				this->graphics_->SetShader(this->default_shader_);
-				this->graphics_->SetColor(DirectX::Color(.6f, .6f, 1.f, 1.f));
+
+				auto & a = port->position(view);
+				auto & b = port->connect()->position(view);
+
+				auto ang1 = DirectX::XMConvertToDegrees(atan2f(a.y - mouse.y, a.x - mouse.x));
+				auto ang2 = DirectX::XMConvertToDegrees(atan2f(b.y - mouse.y, b.x - mouse.x) + DirectX::XM_PI);
+
+				if (ang1 > 180.f)
+					ang1 -= 360.f;
+				if (ang1 < -180.f)
+					ang1 += 360.f;
+
+				if (ang2 > 180.f)
+					ang2 -= 360.f;
+				if (ang2 < -180.f)
+					ang2 += 360.f;
+
+				if (fabsf(ang1 - ang2) < 10.f)
+					this->graphics_->SetColor(DirectX::Color(.2f, .2f, .2f, 1.f));
+				else
+					this->graphics_->SetColor(DirectX::Color(.2f, .2f, .2f, .8f));
+
 				this->graphics_->SetShaderResourceFromTexture(0, { this->node_tex_ });
-				this->graphics_->DrawLine({ pos.x, pos.y }, port->connect()->position());
+				this->graphics_->SetView(DirectX::Matrix::Identity);
+				this->graphics_->DrawLine({ a.x, a.y }, port->connect()->position(view));
 			}
 		}
 
@@ -215,25 +315,18 @@ void Seed::NodeSystem::Draw(void)
 			this->graphics_->SetColor(node->output_port(n)->color());
 			auto & position = node->position();
 			auto & size = node->size();
-			this->graphics_->DrawTexture(this->port_tex_, port->position(), { 0.2f, 0.2f }, 0);
-
-			if (port->connect())
-			{
-				auto pos = port->position();
-				this->graphics_->SetShader(this->default_shader_);
-				this->graphics_->SetColor(DirectX::Color(.6f, .6f, 1.f, 1.f));
-				this->graphics_->SetShaderResourceFromTexture(0, { this->node_tex_ });
-				this->graphics_->DrawLine({ pos.x, pos.y }, port->connect()->position());
-			}
+			this->graphics_->SetView(view);
+			this->graphics_->DrawTexture(this->output_port_tex_, port->position(), { 0.1f, 0.1f }, 0);
 		}
 	}
 
 	if (this->start_port_)
 	{
-		auto pos = this->start_port_->position();
+		auto pos = this->start_port_->position(view);
 		this->graphics_->SetShader(this->default_shader_);
-		this->graphics_->SetColor(DirectX::Color(.6f, .6f, 1.f, 1.f));
+		this->graphics_->SetColor(DirectX::Color(.2f, .2f, .2f, .8f));
 		this->graphics_->SetShaderResourceFromTexture(0, { this->node_tex_ });
+		this->graphics_->SetView(DirectX::Matrix::Identity);
 		this->graphics_->DrawLine({ pos.x, pos.y }, mouse);
 	}
 }

@@ -2,6 +2,12 @@ Texture2D color_tex : register(t0);
 
 SamplerState own_sampler : register(s0);
 
+cbuffer unique : register(b0)
+{
+    float2 g_scale : packoffset(c0.x);
+    float2 g_scroll : packoffset(c0.z);
+};
+
 cbuffer main : register(b1)
 {
     row_major matrix g_world : packoffset(c0);
@@ -41,7 +47,7 @@ PsOut PS(VsOut input)
 {
     PsOut output = (PsOut) 0;
     
-    float4 tex = color_tex.Sample(own_sampler, input.uv_) * g_color;
+    float4 tex = color_tex.Sample(own_sampler, input.uv_ * g_scale + g_scroll) * g_color;
 
     output.color_ = tex;
 

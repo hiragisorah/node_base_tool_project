@@ -20,22 +20,33 @@ namespace Seed
 		std::vector<std::unique_ptr<Node>> nodes_;
 		std::unique_ptr<Node> * grab_node_;
 		Port * start_port_;
+		DirectX::Vector2 view_pos_;
+		bool screen_grab_;
 
 	public:
-		template<class _Node> void AddNodes(const DirectX::Vector3 & position)
+		template<class _Node> void AddNodes(const DirectX::Vector3 & position, const DirectX::Matrix & view = DirectX::Matrix::Identity)
 		{
 			this->nodes_.emplace_back(std::make_unique<_Node>());
-			this->nodes_.back()->set_position(position);
+
+			DirectX::Matrix inv;
+			view.Invert(inv);
+
+			auto matrix = DirectX::Matrix::CreateTranslation(position) * inv;
+			auto pos = matrix.Translation();
+			this->nodes_.back()->set_position(pos);
 		}
 
 	private:
 		void Draw9Patch(const unsigned int & texture_id, const float & x, const float & y, const float & width, const float & height, const float & ang);
 
 	private:
+		unsigned int bg_tex_;
 		unsigned int node_tex_;
-		unsigned int port_tex_;
-		unsigned int nine_path_shader_;
+		unsigned int input_port_tex_;
+		unsigned int output_port_tex_;
 		unsigned int default_shader_;
+		unsigned int repeat_shader_;
+		unsigned int nine_path_shader_;
 
 	public:
 		void set_default_shader(const unsigned int & shader_id);
@@ -54,7 +65,13 @@ namespace Seed
 			__declspec(align(16)) struct { float left, top, right, bottom; } border_;
 		};
 
+		struct RepeatBuffer
+		{
+			__declspec(align(16)) struct { DirectX::Vector2 scale, scroll; } uv_;
+		};
+
 	private:
 		NinePatchBuffer np_cb_;
+		RepeatBuffer repeat_cb_;
 	};
 }
