@@ -28,6 +28,9 @@
       <Extensions>moc;h;cpp</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files\nodes">
+      <UniqueIdentifier>{bc2dafd2-8109-4b21-8761-9e4149c5e67b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -73,6 +76,15 @@
     </ClInclude>
     <ClInclude Include="port.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="node_a.h">
+      <Filter>Header Files\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="node_b.h">
+      <Filter>Header Files\nodes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,12 +7,11 @@ Seed::Node::Node(void)
 	: position_(DirectX::Vector3::Zero)
 	, size_(DirectX::Vector2(100.f, 40.f))
 {
-	this->add_input_port<TPort<int>>();
-	this->add_input_port<TPort<float>>();
-	this->add_input_port<TPort<int>>();
-	this->add_output_port<TPort<double>>();
-	this->add_output_port<TPort<int>>();
-	this->add_output_port<TPort<float>>();
+
+}
+
+Seed::Node::~Node(void)
+{
 }
 
 void Seed::Node::set_position(const DirectX::Vector3 & position)

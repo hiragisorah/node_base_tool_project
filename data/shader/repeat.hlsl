@@ -47,7 +47,7 @@ PsOut PS(VsOut input)
 {
     PsOut output = (PsOut) 0;
     
-    float4 tex = color_tex.Sample(own_sampler, input.uv_ * g_scale + g_scroll) * g_color;
+    float4 tex = color_tex.Sample(own_sampler, input.uv_ * g_scale + (1.f - g_scale) * 0.5f + g_scroll) * g_color;
 
     output.color_ = tex;
 

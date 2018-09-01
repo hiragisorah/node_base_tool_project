@@ -137,7 +137,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="input.h" />
     <ClInclude Include="node.h" />
+    <ClInclude Include="node_a.h" />
+    <ClInclude Include="node_b.h" />
     <ClInclude Include="node_system.h" />
     <ClInclude Include="port.h" />
   </ItemGroup>

@@ -15,7 +15,7 @@ namespace Seed
 	class Port
 	{
 	public:
-		Port(const PortType & type);
+		Port(const PortType & type = PortType::Input);
 
 	protected:
 		DirectX::Vector2 position_;
@@ -59,7 +59,7 @@ namespace Seed
 			colors[typeid(DirectX::Color)] = DirectX::Color(1, 0, 1, 1);
 			colors[typeid(DirectX::Vector2)] = DirectX::Color(1, 1, 0, 1);
 			colors[typeid(DirectX::Matrix)] = DirectX::Color(0, 0, .5f, 1);
-			colors[typeid(std::string)] = DirectX::Color(0, 0, .5f, 1);
+			colors[typeid(std::string)] = DirectX::Color(0.5f, 0, 0.5f, 1);
 
 			this->set_color(colors[this->var_type_]);
 		}

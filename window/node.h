@@ -12,6 +12,7 @@ namespace Seed
 	{
 	public:
 		Node(void);
+		virtual ~Node(void);
 
 	private:
 		DirectX::Vector3 position_;
@@ -44,5 +45,32 @@ namespace Seed
 
 	public:
 		void Update(void);
+
+	public:
+		void operator=(const Node & node)
+		{
+			this->input_ports_.resize(0);
+
+			for (auto & port : node.input_ports_)
+			{
+				this->add_input_port<TPort<int>>();
+				*this->input_ports_.back() = *port;
+			}
+
+			this->output_ports_.resize(0);
+
+			for (auto & port : node.output_ports_)
+			{
+				this->add_output_port<TPort<int>>();
+				*this->output_ports_.back() = *port;
+			}
+
+			//this->output_ports_.resize(node.output_ports_.size());
+
+			//for (int n = 0; n < this->input_ports_.size(); ++n)
+			//	*this->input_ports_[n] = *node.input_ports_[n];
+			//for (int n = 0; n < this->output_ports_.size(); ++n)
+			//	*this->output_ports_[n] = *node.output_ports_[n];
+		}
 	};
 }

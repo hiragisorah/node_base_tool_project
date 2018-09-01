@@ -4,6 +4,8 @@
 #include <d3dcompiler.h>
 #include <wrl/client.h>
 
+#include <algorithm>
+
 #include "DirectXTex.h"
 #include "resource_pool.h"
 

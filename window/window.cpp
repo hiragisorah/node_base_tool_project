@@ -1,5 +1,10 @@
-#include "window.h"
+﻿#include "window.h"
+#include "input.h"
 #include <node_system.h>
+#include <qtimeline.h>
+
+static float wheel_x = 0;
+static float wheel_y = 0;
 
 window::window(QWidget *parent)
 	: QMainWindow(parent)
@@ -49,53 +54,23 @@ void window::Update(void)
 
 		node_system.Update();
 		node_system.Draw();
-
-		{ // node
-			//static int hole_left_num = 2;
-			//static int hole_right_num = 2;
-
-			//if (GetKeyState('W') & 0x800)
-			//	if (hole_right_num > 1)
-			//		hole_right_num--;
-
-			//if (GetKeyState('S') & 0x800)
-			//	hole_right_num++;
-
-
-			//if (GetKeyState('A') & 0x800)
-			//	if (hole_left_num > 1)
-			//		hole_left_num--;
-
-			//if (GetKeyState('D') & 0x800)
-			//	hole_left_num++;
-
-			//const int hole_move = 45.f;
-
-			//auto width = 100.f;
-			//auto height = 70.f + std::max(hole_right_num, hole_left_num) * hole_move / 2.f;
-			//
-			//auto hole_start = height - 90;
-			//
-			//for (int n = 0; n < hole_right_num; ++n)
-			//{ // hole-right
-			//	this->graphics_->SetShader(this->sh_default_);
-			//	this->graphics_->SetColor(DirectX::Color(.8f, .8f, .8f, 1));
-			//	this->graphics_->DrawTexture(this->tex_node_hole_, { +width / 1.f, hole_start + n * -hole_move }, { .5f,.5f }, 0);
-			//}
-
-			//for (int n = 0; n < hole_left_num; ++n)
-			//{ // hole-right
-			//	this->graphics_->SetShader(this->sh_default_);
-			//	this->graphics_->SetColor(DirectX::Color(.8f, .8f, .8f, 1));
-			//	this->graphics_->DrawTexture(this->tex_node_hole_, { -width / 1.f, hole_start + n * -hole_move }, { .5f,.5f }, 0);
-			//}
-
-			//{ // main
-			//	this->Draw9Patch(this->window_tex_, 0, 0, width, height, 0);
-			//	this->graphics_->SetShader(this->sh_default_);
-			//}
-		}
+		wheel_y = 0;
 	}
 
 	this->graphics_->Present(Seed::Graphics::FrameRate::Unlimited);
+}
+
+void window::wheelEvent(QWheelEvent * e)
+{
+	wheel_y = e->angleDelta().y() > 0 ? 0.1f : -0.1f;
+}
+
+const float & Seed::Input::GetWheelX(void)
+{
+	return wheel_x;
+}
+
+const float & Seed::Input::GetWheelY(void)
+{
+	return wheel_y;
 }
